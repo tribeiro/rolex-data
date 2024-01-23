@@ -1,0 +1,21 @@
+	<span class="score">
+      &#128206;
+	</span>
+	<span class="title">
+			<a>
+        {{ message_text }}
+			</a>
+	</span>
+	<span class="meta">
+  {% match date_added %}
+    {% when Some with (val) %}
+      Found {{ val }}
+    <a>
+      {{ user_id }} {{ val }}
+    </a>
+    {% when None %}
+    <a>
+      {{ user_id }}
+    </a>
+  {% endmatch %}
+	</span>

@@ -1,5 +1,9 @@
+use askama::Template;
+use std::{collections::HashMap, error::Error};
+use url::Url;
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Template)]
+#[template(path = "exposure_log.html")]
 pub struct ExposureLog {
     id: String,
     site_id: String,
@@ -19,6 +23,32 @@ pub struct ExposureLog {
     date_added: Option<String>,
     date_invalidated: Option<String>,
     parent_id: Option<String>,
+}
+
+impl ExposureLog {
+    pub async fn retrieve(
+        url: &str,
+        params: &Option<HashMap<String, String>>,
+    ) -> Result<Vec<ExposureLog>, Box<dyn Error>> {
+        let url = {
+            let mut url = Url::parse(url)?;
+
+            if let Some(params) = params {
+                for (key, value) in params {
+                    url.query_pairs_mut().append_pair(key, value);
+                }
+            }
+            url
+        };
+
+        let response = reqwest::get(&url.to_string()).await?;
+
+        let response_text = response.text().await?;
+
+        let exposure_logs: Vec<ExposureLog> = serde_json::from_str(&response_text)?;
+
+        Ok(exposure_logs)
+    }
 }
 
 #[cfg(test)]
