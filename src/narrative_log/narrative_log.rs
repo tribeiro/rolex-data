@@ -20,13 +20,15 @@ pub struct NarrativeLog {
     date_added: String,
     date_invalidated: Option<String>,
     parent_id: Option<String>,
-    systems: Vec<String>,
-    subsystems: Vec<String>,
-    cscs: Vec<String>,
+    systems: Option<Vec<String>>,
+    subsystems: Option<Vec<String>>,
+    cscs: Option<Vec<String>>,
     date_end: String,
-    components: Option<String>,
-    primary_software_components: Option<String>,
-    primary_hardware_components: Option<String>,
+    components: Option<Vec<String>>,
+    primary_software_components: Vec<String>,
+    primary_hardware_components: Vec<String>,
+    category: String,
+    time_lost_type: Option<String>,
 }
 
 impl NarrativeLog {
