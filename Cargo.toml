@@ -6,10 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+askama = "0.12.1"
 chrono = "0.4.31"
 reqwest = "0.11.22"
 serde = "1.0.189"
 serde_derive = "1.0.189"
 serde_json = "1.0.107"
+thiserror = "1.0.63"
 tokio = { version = "1.33.0", features = ["full"] }
 url = "2.4.1"
+lsst_efd_client = {path = "../lsst_efd_client/"}

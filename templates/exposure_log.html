@@ -1,0 +1,34 @@
+<div class="exposureLog {{ Self::get_labels_as_str(self) }}">
+<p>
+	<span class="score">
+      <button class="btn"><i class="fa fa-image"></i></button>
+	</span>
+	<span class="title">
+			<a>
+        {{ message_text }}
+			</a>
+	</span>
+  {% set attached_images = Self::get_attached_images(self) %}
+  {% if attached_images.len() > 0 %}
+    {% for url in attached_images %}
+    <img src={{ url }} alt="Attached image." width=256>
+    {% endfor %}
+  {% endif %}
+	<span class="score2" title="narrative log labels.">
+    {{ Self::get_labels_as_str(self) }}
+	</span>
+	<span class="meta">
+  {% match date_added %}
+    {% when Some with (val) %}
+      Found {{ val }}
+    <a>
+      {{ user_id }} {{ val }}
+    </a>
+    {% when None %}
+    <a>
+      {{ user_id }}
+    </a>
+  {% endmatch %}
+	</span>
+</p>
+</div>

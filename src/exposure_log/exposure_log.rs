@@ -1,5 +1,9 @@
+use askama::Template;
+use std::{collections::HashMap, error::Error};
+use url::Url;
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Template)]
+#[template(path = "exposure_log.html")]
 pub struct ExposureLog {
     id: String,
     site_id: String,
@@ -19,6 +23,49 @@ pub struct ExposureLog {
     date_added: Option<String>,
     date_invalidated: Option<String>,
     parent_id: Option<String>,
+}
+
+impl ExposureLog {
+    pub fn get_date_added(&self) -> &Option<String> {
+        &self.date_added
+    }
+    pub fn get_labels_as_str(&self) -> String {
+        self.instrument.to_owned()
+    }
+    pub fn get_attached_images(&self) -> Vec<String> {
+        let day_obs = self.day_obs as f64;
+        let yyyy = ((self.day_obs / 10000) as f64).round();
+        let mm = ((day_obs - yyyy * 10000.) / 100.).round();
+        let dd = (day_obs - yyyy * 10000. - mm * 100.).round();
+        let seq_num = self.seq_num;
+        vec![format!(
+            "https://storage.googleapis.com/rubintv_data/auxtel_monitor/auxtel-monitor_dayObs_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_seqNum_{seq_num}.png"
+        )]
+        // self.urls.iter().filter_map(|url| if url.ends_with(""))
+    }
+    pub async fn retrieve(
+        url: &str,
+        params: &Option<HashMap<String, String>>,
+    ) -> Result<Vec<ExposureLog>, Box<dyn Error>> {
+        let url = {
+            let mut url = Url::parse(url)?;
+
+            if let Some(params) = params {
+                for (key, value) in params {
+                    url.query_pairs_mut().append_pair(key, value);
+                }
+            }
+            url
+        };
+
+        let response = reqwest::get(&url.to_string()).await?;
+
+        let response_text = response.text().await?;
+
+        let exposure_logs: Vec<ExposureLog> = serde_json::from_str(&response_text)?;
+
+        Ok(exposure_logs)
+    }
 }
 
 #[cfg(test)]

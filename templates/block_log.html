@@ -1,0 +1,20 @@
+<div class="block_item {{ Self::get_index_label(self) }}" style="display:none;">
+<p>
+	<span class="score" title="Block entry.">
+    <button class="btn"><i class="fa fa-delicious"></i></button>
+	</span>
+	<span class="title">
+			<a>
+      Block {{ id }} - {{ status }}
+			</a>
+	</span>
+	<span class="score2" title="Block labels.">
+    {{ Self::get_index_label(self) }}
+	</span>
+	<span class="meta">
+    <a>
+      {{ time }}
+    </a>
+	</span>
+</p>
+</div>
