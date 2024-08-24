@@ -26,6 +26,23 @@ pub struct ExposureLog {
 }
 
 impl ExposureLog {
+    pub fn get_date_added(&self) -> &Option<String> {
+        &self.date_added
+    }
+    pub fn get_labels_as_str(&self) -> String {
+        self.instrument.to_owned()
+    }
+    pub fn get_attached_images(&self) -> Vec<String> {
+        let day_obs = self.day_obs as f64;
+        let yyyy = ((self.day_obs / 10000) as f64).round();
+        let mm = ((day_obs - yyyy * 10000.) / 100.).round();
+        let dd = (day_obs - yyyy * 10000. - mm * 100.).round();
+        let seq_num = self.seq_num;
+        vec![format!(
+            "https://storage.googleapis.com/rubintv_data/auxtel_monitor/auxtel-monitor_dayObs_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_seqNum_{seq_num}.png"
+        )]
+        // self.urls.iter().filter_map(|url| if url.ends_with(""))
+    }
     pub async fn retrieve(
         url: &str,
         params: &Option<HashMap<String, String>>,
