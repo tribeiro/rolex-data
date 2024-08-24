@@ -32,6 +32,36 @@ pub struct NarrativeLog {
 }
 
 impl NarrativeLog {
+    pub fn get_date_added(&self) -> &str {
+        &self.date_added
+    }
+
+    pub fn get_labels(&self) -> Vec<String> {
+        self.components.clone().unwrap_or(vec!["None".to_owned()])
+    }
+
+    pub fn get_labels_as_str(&self) -> String {
+        if let Some(components) = &self.components {
+            components
+                .into_iter()
+                .map(|label| format!("{label} "))
+                .collect()
+        } else {
+            "".to_string()
+        }
+    }
+    pub fn get_attached_images(&self) -> Vec<String> {
+        self.urls
+            .iter()
+            .filter_map(|url| {
+                if url.ends_with(".jpeg") || url.ends_with(".jpg") || url.ends_with(".png") {
+                    Some(url.to_owned())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
     pub async fn retrieve(
         url: &str,
         params: &Option<HashMap<String, String>>,
