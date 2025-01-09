@@ -38,9 +38,23 @@ impl ExposureLog {
         let mm = ((day_obs - yyyy * 10000.) / 100.).round();
         let dd = (day_obs - yyyy * 10000. - mm * 100.).round();
         let seq_num = self.seq_num;
-        vec![format!(
-            "https://storage.googleapis.com/rubintv_data/auxtel_monitor/auxtel-monitor_dayObs_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_seqNum_{seq_num}.png"
-        )]
+        if let Some(instance) = {
+            if self.instrument == "LATISS" {
+                Some("auxtel/monitor/auxtel_monitor")
+            } else if self.instrument == "ComCam" {
+                Some("comcam/focal_plane_mosaic/comcam_focal_plane_mosaic")
+            } else if self.instrument == "LSSTCam" {
+                Some("lsstcam/focal_plane_mosaic/lsstcam_focal_plane_mosaic")
+            } else {
+                None
+            }
+        } {
+            vec![format!(
+                "https://summit-lsp.lsst.codes/rubintv/event_image/summit/{instance}_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_{seq_num:06}.png"
+            )]
+        } else {
+            vec![]
+        }
         // self.urls.iter().filter_map(|url| if url.ends_with(""))
     }
     pub async fn retrieve(
