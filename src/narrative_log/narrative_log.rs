@@ -47,15 +47,12 @@ impl NarrativeLog {
     }
 
     pub fn get_labels_as_str(&self) -> String {
-        if let Some(components) = &self.components {
-            components
-                .into_iter()
-                .map(|label| format!("{label} "))
-                .collect()
-        } else {
-            "".to_string()
-        }
+        self.get_labels()
+            .into_iter()
+            .map(|label| label + " ")
+            .collect()
     }
+
     pub fn get_attached_images(&self) -> Vec<String> {
         self.urls
             .iter()
