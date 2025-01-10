@@ -25,10 +25,11 @@ pub struct NarrativeLog {
     cscs: Option<Vec<String>>,
     date_end: String,
     components: Option<Vec<String>>,
-    primary_software_components: Vec<String>,
-    primary_hardware_components: Vec<String>,
+    primary_software_components: Option<Vec<String>>,
+    primary_hardware_components: Option<Vec<String>>,
     category: String,
     time_lost_type: Option<String>,
+    components_json: Option<HashMap<String, String>>,
 }
 
 impl NarrativeLog {
