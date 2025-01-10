@@ -38,7 +38,12 @@ impl NarrativeLog {
     }
 
     pub fn get_labels(&self) -> Vec<String> {
-        self.components.clone().unwrap_or(vec!["None".to_owned()])
+        self.components_json
+            .clone()
+            .unwrap_or(HashMap::from([("None".to_string(), "".to_string())]))
+            .iter()
+            .map(|(_, value)| value.to_string())
+            .collect::<Vec<String>>()
     }
 
     pub fn get_labels_as_str(&self) -> String {
