@@ -29,9 +29,18 @@ impl ExposureLog {
     pub fn get_date_added(&self) -> &Option<String> {
         &self.date_added
     }
+
+    pub fn get_formatted_message_text(&self) -> String {
+        self.message_text
+            .replace("\r\n", "<br>")
+            .replace('\n', "<br>")
+            .to_owned()
+    }
+
     pub fn get_labels_as_str(&self) -> String {
         self.instrument.to_owned()
     }
+
     pub fn get_attached_images(&self) -> Vec<String> {
         let day_obs = self.day_obs as f64;
         let yyyy = ((self.day_obs / 10000) as f64).round();
