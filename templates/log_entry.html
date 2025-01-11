@@ -4,9 +4,9 @@
     <button class="btn"><i class="fa fa-user-circle"></i></button> 
 	</span>
 	<span class="title">
-			<a>
-        {{ message_text }}
-			</a>
+    <a>
+        {{ Self::get_formatted_message_text(self)|safe }}
+    </a>
 	</span>
   {% set attached_images = Self::get_attached_images(self) %}
   {% if attached_images.len() > 0 %}
