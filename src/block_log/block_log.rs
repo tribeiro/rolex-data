@@ -1,5 +1,5 @@
 use askama::Template;
-use chrono::{DateTime, NaiveDateTime};
+use chrono::NaiveDateTime;
 use lsst_efd_client::EfdAuth;
 use reqwest::Client;
 use std::error::Error as StdError;
