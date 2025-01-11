@@ -5,7 +5,7 @@
 	</span>
 	<span class="title">
 			<a>
-        {{ message_text }}
+        {{ Self::get_formatted_message_text(self)|safe }}
 			</a>
 	</span>
   {% set attached_images = Self::get_attached_images(self) %}
