@@ -1,6 +1,11 @@
 use askama::Template;
 use std::{collections::HashMap, error::Error};
+use thiserror::Error as ThisError;
 use url::Url;
+
+#[derive(Clone, Debug, Eq, ThisError, PartialEq)]
+#[error("{0}")]
+pub struct ErrorRetrievingNarrativeLog(String);
 
 #[derive(Debug, Deserialize, Serialize, Default, Template)]
 #[template(path = "log_entry.html", ext = "html")]
@@ -91,9 +96,12 @@ impl NarrativeLog {
 
         let response_text = response.text().await?;
 
-        let narrative_logs: Vec<NarrativeLog> = serde_json::from_str(&response_text)?;
-
-        Ok(narrative_logs)
+        match serde_json::from_str(&response_text) {
+            Ok(narrative_logs) => Ok(narrative_logs),
+            Err(err) => Err(Box::new(ErrorRetrievingNarrativeLog(format!(
+                "{err}: {response_text}"
+            )))),
+        }
     }
 }
 
