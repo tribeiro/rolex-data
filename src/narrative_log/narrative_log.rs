@@ -1,4 +1,5 @@
 use askama::Template;
+use serde_json::Value;
 use std::{collections::HashMap, error::Error};
 use thiserror::Error as ThisError;
 use url::Url;
@@ -34,7 +35,7 @@ pub struct NarrativeLog {
     primary_hardware_components: Option<Vec<String>>,
     category: String,
     time_lost_type: Option<String>,
-    components_json: Option<HashMap<String, String>>,
+    components_json: Option<HashMap<String, Value>>,
 }
 
 impl NarrativeLog {
@@ -52,9 +53,12 @@ impl NarrativeLog {
     pub fn get_labels(&self) -> Vec<String> {
         self.components_json
             .clone()
-            .unwrap_or(HashMap::from([("None".to_string(), "".to_string())]))
+            .unwrap_or(HashMap::from([(
+                "None".to_string(),
+                Value::String("".to_string()),
+            )]))
             .iter()
-            .map(|(_, value)| value.to_string())
+            .map(|(_, value)| value.to_string().replace("\"", ""))
             .collect::<Vec<String>>()
     }
 
