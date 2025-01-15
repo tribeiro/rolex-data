@@ -5,8 +5,11 @@ mod narrative_log;
 #[macro_use]
 extern crate serde_derive;
 
-use rolex::block_log::block_log::BlockLog;
 use rolex::night_plan::night_plan::NightPlan;
+use rolex::{
+    block_log::block_log::BlockLog, sal_script_info::available_scripts::AvailableScript,
+    sal_script_info::sal_script_info::SalScriptInfo,
+};
 use std::{collections::HashMap, error::Error};
 use url::Url;
 
@@ -83,7 +86,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     */
     let parse_from_str = chrono::NaiveDateTime::parse_from_str;
 
-    let date_start = parse_from_str("2024-08-13T12:00:00", "%Y-%m-%dT%H:%M:%S")?;
+    let date_start = parse_from_str("2025-01-09T12:00:00", "%Y-%m-%dT%H:%M:%S")?;
     let date_end = date_start + chrono::Duration::days(1);
     println!("{date_start:?} {date_end:?}");
 
@@ -91,8 +94,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{fault_logs:?}");
 
-    let block_logs = BlockLog::retrieve("summit_efd", &date_start, &date_end).await;
+    // let block_logs = BlockLog::retrieve("summit_efd", &date_start, &date_end).await;
 
-    println!("{block_logs:?}");
+    // println!("{block_logs:?}");
+    let available_scripts = AvailableScript::retrieve("summit_efd", &date_start, &date_end).await?;
+    println!("Found {} scripts.", available_scripts.len());
+    for available_script in available_scripts.into_iter() {
+        println!("========");
+        println!("{available_script:?}");
+        let script_info = SalScriptInfo::retrieve("summit_efd", &available_script).await?;
+        println!("{script_info:?}");
+    }
+
     Ok(())
 }

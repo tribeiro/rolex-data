@@ -1,9 +1,11 @@
 use askama::Template;
-use chrono::{DateTime, NaiveDateTime};
+use chrono::NaiveDateTime;
 use lsst_efd_client::EfdAuth;
 use reqwest::Client;
 use std::error::Error as StdError;
 use thiserror::Error;
+
+use crate::efd_utils::efd_utils::QueryResult;
 
 #[derive(Clone, Debug, Eq, Error, PartialEq)]
 #[error("{0}")]
@@ -20,24 +22,13 @@ pub struct BlockLog {
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
-struct QueryResult {
-    results: Vec<Payload>,
-}
-
-#[derive(Debug, Deserialize, Serialize, Default)]
-struct Payload {
-    statement_id: usize,
-    series: Vec<Series>,
-}
-
-#[derive(Debug, Deserialize, Serialize, Default)]
-struct Series {
+struct FaultLogSeries {
     name: String,
     columns: Vec<String>,
     values: Vec<(String, String, String, String, usize)>,
 }
 
-impl Series {
+impl FaultLogSeries {
     fn into_fault_log(&self) -> Vec<BlockLog> {
         self.values
             .iter()
@@ -95,7 +86,7 @@ impl BlockLog {
         if response.status().is_success() {
             // Parse the response JSON
             let text = response.text().await?;
-            let query_result: QueryResult = serde_json::from_str(&text)?;
+            let query_result: QueryResult<FaultLogSeries> = serde_json::from_str(&text)?;
             Ok(query_result.results[0].series[0].into_fault_log())
         } else {
             println!("{response:?}");
