@@ -1,6 +1,12 @@
 use askama::Template;
+use serde_json::Value;
 use std::{collections::HashMap, error::Error};
+use thiserror::Error as ThisError;
 use url::Url;
+
+#[derive(Clone, Debug, Eq, ThisError, PartialEq)]
+#[error("{0}")]
+pub struct ErrorRetrievingNarrativeLog(String);
 
 #[derive(Debug, Deserialize, Serialize, Default, Template)]
 #[template(path = "log_entry.html", ext = "html")]
@@ -29,7 +35,7 @@ pub struct NarrativeLog {
     primary_hardware_components: Option<Vec<String>>,
     category: String,
     time_lost_type: Option<String>,
-    components_json: Option<HashMap<String, String>>,
+    components_json: Option<HashMap<String, Value>>,
 }
 
 impl NarrativeLog {
@@ -47,9 +53,12 @@ impl NarrativeLog {
     pub fn get_labels(&self) -> Vec<String> {
         self.components_json
             .clone()
-            .unwrap_or(HashMap::from([("None".to_string(), "".to_string())]))
+            .unwrap_or(HashMap::from([(
+                "None".to_string(),
+                Value::String("".to_string()),
+            )]))
             .iter()
-            .map(|(_, value)| value.to_string())
+            .map(|(_, value)| value.to_string().replace("\"", ""))
             .collect::<Vec<String>>()
     }
 
@@ -91,9 +100,12 @@ impl NarrativeLog {
 
         let response_text = response.text().await?;
 
-        let narrative_logs: Vec<NarrativeLog> = serde_json::from_str(&response_text)?;
-
-        Ok(narrative_logs)
+        match serde_json::from_str(&response_text) {
+            Ok(narrative_logs) => Ok(narrative_logs),
+            Err(err) => Err(Box::new(ErrorRetrievingNarrativeLog(format!(
+                "{err}: {response_text}"
+            )))),
+        }
     }
 }
 
