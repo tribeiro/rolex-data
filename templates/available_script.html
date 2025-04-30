@@ -1,0 +1,15 @@
+<div class="availableScript {{ Self::get_labels_as_str(self) }}" {{ Self::get_display_style(self) }}>
+<p>
+	<span class="score">
+    <button class="btn"><i class="fa fa-sticky-note-o" aria-hidden="true"></i></button> 
+	</span>
+    <span id='span{{ sal_index }}' class="title" style="overflow: hidden; max-height: 100px; transition: max-height 0.3s ease-out;"><a id='{{ sal_index }}'>[{{ sal_index }}] - [{{ state }}] - [{{ class_name }}]{{ Self::get_script_configuration_display(self) }}</a></span>
+	<span class="score2" title="Request script info."><button
+      onclick="getScriptInfo('{{ sal_index }}', '{{ timestamp }}')"
+      class="btn"
+      id='buttonGetInfo{{ sal_index }}'
+    >Info</button></span>
+    <span class="meta"><a>{{ timestamp }}</a> <button id='collapse{{ sal_index }}' onclick="toggleCollapse('{{ sal_index }}')">Show more</button></span>
+</p>
+</div>
+

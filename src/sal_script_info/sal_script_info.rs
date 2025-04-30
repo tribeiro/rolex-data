@@ -1,7 +1,7 @@
-use chrono::NaiveDateTime;
+use askama::Template;
 use lsst_efd_client::EfdAuth;
 use reqwest::Client;
-use std::error::Error as StdError;
+use std::{error::Error as StdError, fmt};
 use thiserror::Error;
 
 use crate::{
@@ -40,10 +40,48 @@ impl LogMessagesSeries {
             .collect()
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Template, Default)]
+#[template(path = "sal_script_info.html")]
 /// Store summary information about a single SAL Script.
 pub struct SalScriptInfo {
     log_messages: Vec<LogMessage>,
+}
+
+impl fmt::Display for LogMessage {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Write strictly the first element into the supplied output
+        // stream: `f`. Returns `fmt::Result` which indicates whether the
+        // operation succeeded or failed. Note that `write!` uses syntax which
+        // is very similar to `println!`.
+        let level = {
+            if self.level <= 10 {
+                "<strong><font color=\"blue\">DEBUG</font></strong>"
+            } else if self.level > 10 && self.level <= 20 {
+                "<strong><font color=\"green\">INFO </font></strong>"
+            } else if self.level > 20 && self.level <= 30 {
+                "<strong><font color=\"orange\">WARN </font></strong>"
+            } else {
+                "<strong><font color=\"red\">ERROR</font></strong>"
+            }
+        };
+        write!(
+            f,
+            "<tt>{} - {} - {} {}</tt>",
+            &self.timestamp[..22],
+            level,
+            self.message
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\r\n", "<br>")
+                .replace("\n", "<br>"),
+            self.traceback
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\r\n", "<br>")
+                .replace("\n", "<br>")
+        )
+    }
 }
 
 impl SalScriptInfo {
