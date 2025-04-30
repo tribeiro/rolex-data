@@ -1,7 +1,8 @@
+use askama::Template;
 use chrono::NaiveDateTime;
 use lsst_efd_client::EfdAuth;
 use reqwest::Client;
-use std::{collections::HashMap, error::Error as StdError};
+use std::{collections::HashMap, error::Error as StdError, fmt, u32};
 use thiserror::Error;
 
 use crate::efd_utils::efd_utils::QueryResult;
@@ -44,8 +45,9 @@ impl Series {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub enum ScriptState {
+    #[default]
     Unknown,
     Unconfigured,
     Configured,
@@ -58,6 +60,17 @@ pub enum ScriptState {
     Stopped,
     Failed,
     ConfigureFailed,
+}
+
+impl fmt::Display for ScriptState {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Write strictly the first element into the supplied output
+        // stream: `f`. Returns `fmt::Result` which indicates whether the
+        // operation succeeded or failed. Note that `write!` uses syntax which
+        // is very similar to `println!`.
+        write!(f, "{:?}", self)
+    }
 }
 
 impl ScriptState {
@@ -76,6 +89,16 @@ impl ScriptState {
             11 => ScriptState::ConfigureFailed,
             _ => ScriptState::Unknown,
         }
+    }
+
+    pub fn is_final(&self) -> bool {
+        [
+            ScriptState::Done,
+            ScriptState::Stopped,
+            ScriptState::Failed,
+            ScriptState::ConfigureFailed,
+        ]
+        .contains(self)
     }
 }
 
@@ -111,6 +134,8 @@ impl ScriptConfigurationSeries {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Default, Template)]
+#[template(path = "available_script.html", ext = "html")]
 pub struct AvailableScript {
     pub sal_index: u32,
     pub class_name: String,
@@ -120,6 +145,24 @@ pub struct AvailableScript {
 }
 
 impl AvailableScript {
+    pub fn get_labels_as_str(&self) -> String {
+        format!("{}", self.state)
+    }
+
+    pub fn get_date_added(&self) -> &str {
+        &self.timestamp
+    }
+
+    pub fn is_final(&self) -> bool {
+        self.state.is_final()
+    }
+
+    pub fn get_display_style(&self) -> String {
+        match self.state {
+            ScriptState::Failed => "style=display:block;".to_string(),
+            _ => "style=display:none;".to_string(),
+        }
+    }
 
     pub fn get_script_configuration_display(&self) -> String {
         if self.configuration.len() > 0 {
