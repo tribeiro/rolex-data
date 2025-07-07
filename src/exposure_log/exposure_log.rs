@@ -59,7 +59,7 @@ impl ExposureLog {
             }
         } {
             vec![format!(
-                "https://summit-lsp.lsst.codes/rubintv/event_image/summit/{instance}_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_{seq_num:06}.png"
+                "https://summit-lsp.lsst.codes/rubintv/event_image/summit/{instance}/focal_plane_mosaic/{instance}_focal_plane_mosaic_{yyyy:04.0}-{mm:02.0}-{dd:02.0}_{seq_num:06}.jpg"
             )]
         } else {
             vec![]
