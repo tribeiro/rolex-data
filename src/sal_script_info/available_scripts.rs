@@ -160,12 +160,13 @@ impl AvailableScript {
     pub fn get_display_style(&self) -> String {
         match self.state {
             ScriptState::Failed => "style=display:block;".to_string(),
+            ScriptState::Stopped => "style=display:block;".to_string(),
             _ => "style=display:none;".to_string(),
         }
     }
 
     pub fn get_script_configuration_display(&self) -> String {
-        if self.configuration.len() > 0 {
+        if !self.configuration.is_empty() {
             format!("\n\nScript Configuration:\n\n{}", self.configuration)
         } else {
             "".to_string()
