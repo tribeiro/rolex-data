@@ -160,6 +160,7 @@ impl AvailableScript {
     pub fn get_display_style(&self) -> String {
         match self.state {
             ScriptState::Failed => "style=display:block;".to_string(),
+            ScriptState::Stopped => "style=display:block;".to_string(),
             _ => "style=display:none;".to_string(),
         }
     }
