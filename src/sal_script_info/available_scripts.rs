@@ -166,7 +166,7 @@ impl AvailableScript {
     }
 
     pub fn get_script_configuration_display(&self) -> String {
-        if self.configuration.len() > 0 {
+        if !self.configuration.is_empty() {
             format!("\n\nScript Configuration:\n\n{}", self.configuration)
         } else {
             "".to_string()
